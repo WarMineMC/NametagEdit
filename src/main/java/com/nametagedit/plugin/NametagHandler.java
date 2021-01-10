@@ -5,7 +5,6 @@ import com.nametagedit.plugin.api.data.INametag;
 import com.nametagedit.plugin.api.data.PlayerData;
 import com.nametagedit.plugin.api.events.NametagEvent;
 import com.nametagedit.plugin.api.events.NametagFirstLoadedEvent;
-import com.nametagedit.plugin.metrics.Metrics;
 import com.nametagedit.plugin.storage.AbstractConfig;
 import com.nametagedit.plugin.storage.database.DatabaseConfig;
 import com.nametagedit.plugin.storage.flatfile.FlatFileConfig;
@@ -15,7 +14,6 @@ import com.nametagedit.plugin.utils.Utils;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import me.clip.placeholderapi.PlaceholderAPIPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -334,11 +332,6 @@ public class NametagHandler implements Listener {
         this.longNametagsEnabled = config.getBoolean("Tablist.LongTags");
         this.refreshTagOnWorldChange = config.getBoolean("RefreshTagOnWorldChange");
         DISABLE_PUSH_ALL_TAGS = config.getBoolean("DisablePush");
-
-        if (config.getBoolean("MetricsEnabled")) {
-            Metrics m = new Metrics(NametagEdit.getPlugin(NametagEdit.class));
-            m.addCustomChart(new Metrics.SimplePie("using_spigot", () -> PlaceholderAPIPlugin.getServerVersion().isSpigot() ? "yes" : "no"));
-        }
 
         clearEmptyTeamTask = createTask("ClearEmptyTeamsInterval", clearEmptyTeamTask, new Runnable() {
             @Override
