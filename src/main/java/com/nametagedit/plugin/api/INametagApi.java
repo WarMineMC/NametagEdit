@@ -75,6 +75,18 @@ public interface INametagApi {
     void setPrefix(Player player, String prefix);
 
     /**
+     * Sets the prefix for a player, including sort priority
+     * The previous suffix is kept if it exists.
+     * <p>
+     * Note: Only affects memory, does NOT
+     * add/remove from storage.
+     *
+     * @param player the player whose nametag to change
+     * @param prefix the prefix to change to
+     */
+    void setPrefix(Player player, String prefix, int sortPriority);
+
+    /**
      * Sets the suffix for a player. The previous
      * prefix is kept if it exists.
      * <p>
@@ -85,6 +97,18 @@ public interface INametagApi {
      * @param suffix the suffix to change to
      */
     void setSuffix(Player player, String suffix);
+
+    /**
+     * Sets the suffix for a player, including sort priority
+     * The previous prefix is kept if it exists.
+     * <p>
+     * Note: Only affects memory, does NOT
+     * add/remove from storage.
+     *
+     * @param player the player whose nametag to change
+     * @param suffix the suffix to change to
+     */
+    void setSuffix(Player player, String suffix, int sortPriority);
 
     /**
      * Sets the prefix for a player. The previous
@@ -99,6 +123,18 @@ public interface INametagApi {
     void setPrefix(String player, String prefix);
 
     /**
+     * Sets the prefix for a player, including sort priority
+     * The previous suffix is kept if it exists.
+     * <p>
+     * Note: Only affects memory, does NOT
+     * add/remove from storage.
+     *
+     * @param player the player whose nametag to change
+     * @param prefix the prefix to change to
+     */
+    void setPrefix(String player, String prefix, int sortPriority);
+
+    /**
      * Sets the suffix for a player. The previous
      * prefix is kept if it exists.
      * <p>
@@ -109,6 +145,18 @@ public interface INametagApi {
      * @param suffix the suffix to change to
      */
     void setSuffix(String player, String suffix);
+
+    /**
+     * Sets the suffix for a player, including sort priority
+     * The previous prefix is kept if it exists.
+     * <p>
+     * Note: Only affects memory, does NOT
+     * add/remove from storage.
+     *
+     * @param player the player whose nametag to change
+     * @param suffix the suffix to change to
+     */
+    void setSuffix(String player, String suffix, int sortPriority);
 
     /**
      * Sets the nametag for a player.

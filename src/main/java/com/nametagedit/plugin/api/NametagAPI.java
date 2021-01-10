@@ -19,8 +19,8 @@ import java.util.List;
 @AllArgsConstructor
 public final class NametagAPI implements INametagApi {
 
-    private NametagHandler handler;
-    private NametagManager manager;
+    private final NametagHandler handler;
+    private final NametagManager manager;
 
     @Override
     public FakeTeam getFakeTeam(Player player) {
@@ -55,24 +55,44 @@ public final class NametagAPI implements INametagApi {
 
     @Override
     public void setPrefix(Player player, String prefix) {
+        this.setPrefix(player, prefix, -1);
+    }
+
+    @Override
+    public void setPrefix(Player player, String prefix, int sortPriority) {
         FakeTeam fakeTeam = manager.getFakeTeam(player.getName());
-        setNametagAlt(player, prefix, fakeTeam == null ? null : fakeTeam.getSuffix());
+        setNametagAlt(player, prefix, fakeTeam == null ? null : fakeTeam.getSuffix(), sortPriority);
+    }
+
+    @Override
+    public void setPrefix(String player, String prefix) {
+        this.setPrefix(player, prefix, -1);
+    }
+
+    @Override
+    public void setPrefix(String player, String prefix, int sortPriority) {
+        FakeTeam fakeTeam = manager.getFakeTeam(player);
+        manager.setNametag(player, prefix, fakeTeam == null ? null : fakeTeam.getSuffix(), sortPriority);
     }
 
     @Override
     public void setSuffix(Player player, String suffix) {
+        this.setSuffix(player, suffix, -1);
+    }
+
+    @Override
+    public void setSuffix(Player player, String suffix, int sortPriority) {
         FakeTeam fakeTeam = manager.getFakeTeam(player.getName());
         setNametagAlt(player, fakeTeam == null ? null : fakeTeam.getPrefix(), suffix);
     }
 
     @Override
-    public void setPrefix(String player, String prefix) {
-        FakeTeam fakeTeam = manager.getFakeTeam(player);
-        manager.setNametag(player, prefix, fakeTeam == null ? null : fakeTeam.getSuffix());
+    public void setSuffix(String player, String suffix) {
+        this.setSuffix(player, suffix, -1);
     }
 
     @Override
-    public void setSuffix(String player, String suffix) {
+    public void setSuffix(String player, String suffix, int sortPriority) {
         FakeTeam fakeTeam = manager.getFakeTeam(player);
         manager.setNametag(player, fakeTeam == null ? null : fakeTeam.getPrefix(), suffix);
     }
@@ -131,10 +151,14 @@ public final class NametagAPI implements INametagApi {
         return !event.isCancelled();
     }
 
+    private void setNametagAlt(Player player, String prefix, String suffix) {
+        this.setNametagAlt(player, prefix, suffix, -1);
+    }
+
     /**
      * Private helper function to reduce redundancy
      */
-    private void setNametagAlt(Player player, String prefix, String suffix) {
+    private void setNametagAlt(Player player, String prefix, String suffix, int sortPriority) {
         Nametag nametag = new Nametag(
                 handler.formatWithPlaceholders(player, prefix, true),
                 handler.formatWithPlaceholders(player, suffix, true)
@@ -143,7 +167,7 @@ public final class NametagAPI implements INametagApi {
         NametagEvent event = new NametagEvent(player.getName(), prefix, nametag, NametagEvent.ChangeType.UNKNOWN);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) return;
-        manager.setNametag(player.getName(), nametag.getPrefix(), nametag.getSuffix());
+        manager.setNametag(player.getName(), nametag.getPrefix(), nametag.getSuffix(), sortPriority);
     }
 
 }
