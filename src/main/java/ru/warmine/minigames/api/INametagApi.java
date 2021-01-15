@@ -5,6 +5,7 @@ import ru.warmine.minigames.api.data.GroupData;
 import ru.warmine.minigames.api.data.Nametag;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -75,16 +76,47 @@ public interface INametagApi {
     void setPrefix(Player player, String prefix);
 
     /**
-     * Sets the prefix for a player, including sort priority
+     * Sets the prefix for a player, including sort priority.
      * The previous suffix is kept if it exists.
      * <p>
      * Note: Only affects memory, does NOT
      * add/remove from storage.
      *
      * @param player the player whose nametag to change
+     * @param sortPriority the sort priority in the tab list
      * @param prefix the prefix to change to
      */
     void setPrefix(Player player, String prefix, int sortPriority);
+
+    /**
+     * Sets the prefix for a player, that will
+     * only be visible for certain players. The previous
+     * suffix is kept if it exists.
+     * <p>
+     * Note: Only affects memory, does NOT
+     * add/remove from storage.
+     *
+     * @param player the player whose nametag to change
+     * @param prefix the prefix to change to
+     * @param viewers the players who will see the fake prefix
+     */
+    void setFakePrefix(Player player, String prefix, Collection<Player> viewers);
+
+    /**
+     * Sets the prefix for a player, that will
+     * only be visible for certain players, including
+     * sort priority. The previous suffix is kept
+     * if it exists.
+     * <p>
+     * Note: Only affects memory, does NOT
+     * add/remove from storage.
+     *
+     * @param player the player whose nametag to change
+     * @param prefix the prefix to change to
+     * @param sortPriority the sort priority in the tab list
+     * @param viewers the players who will see the fake prefix
+     */
+    void setFakePrefix(Player player, String prefix, int sortPriority, Collection<Player> viewers);
 
     /**
      * Sets the suffix for a player. The previous
@@ -99,7 +131,7 @@ public interface INametagApi {
     void setSuffix(Player player, String suffix);
 
     /**
-     * Sets the suffix for a player, including sort priority
+     * Sets the suffix for a player, including sort priority.
      * The previous prefix is kept if it exists.
      * <p>
      * Note: Only affects memory, does NOT
@@ -107,8 +139,39 @@ public interface INametagApi {
      *
      * @param player the player whose nametag to change
      * @param suffix the suffix to change to
+     * @param sortPriority the sort priority in the tab list
      */
     void setSuffix(Player player, String suffix, int sortPriority);
+
+    /**
+     * Sets the suffix for a player, that will
+     * only be visible for certain players. The previous
+     * prefix is kept if it exists.
+     * <p>
+     * Note: Only affects memory, does NOT
+     * add/remove from storage.
+     *
+     * @param player the player whose nametag to change
+     * @param suffix the suffix to change to
+     * @param viewers the players who will see the fake suffix
+     */
+    void setFakeSuffix(Player player, String suffix, Collection<Player> viewers);
+
+    /**
+     * Sets the suffix for a player, that will
+     * only be visible for certain players, including
+     * sort priority. The previous prefix is kept
+     * if it exists.
+     * <p>
+     * Note: Only affects memory, does NOT
+     * add/remove from storage.
+     *
+     * @param player the player whose nametag to change
+     * @param suffix the prefix to change to
+     * @param sortPriority the sort priority in the tab list
+     * @param viewers the players who will see the fake suffix
+     */
+    void setFakeSuffix(Player player, String suffix, int sortPriority, Collection<Player> viewers);
 
     /**
      * Sets the prefix for a player. The previous
@@ -123,7 +186,7 @@ public interface INametagApi {
     void setPrefix(String player, String prefix);
 
     /**
-     * Sets the prefix for a player, including sort priority
+     * Sets the prefix for a player, including sort priority.
      * The previous suffix is kept if it exists.
      * <p>
      * Note: Only affects memory, does NOT
@@ -131,8 +194,39 @@ public interface INametagApi {
      *
      * @param player the player whose nametag to change
      * @param prefix the prefix to change to
+     * @param sortPriority the sort priority in the tab list
      */
     void setPrefix(String player, String prefix, int sortPriority);
+
+    /**
+     * Sets the prefix for a player, that will
+     * only be visible for certain players. The previous
+     * suffix is kept if it exists.
+     * <p>
+     * Note: Only affects memory, does NOT
+     * add/remove from storage.
+     *
+     * @param player the player whose nametag to change
+     * @param prefix the prefix to change to
+     * @param viewers the players who will see the fake prefix
+     */
+    void setFakePrefix(String player, String prefix, Collection<Player> viewers);
+
+    /**
+     * Sets the prefix for a player, that will
+     * only be visible for certain players, including
+     * sort priority. The previous suffix is kept
+     * if it exists.
+     * <p>
+     * Note: Only affects memory, does NOT
+     * add/remove from storage.
+     *
+     * @param player the player whose nametag to change
+     * @param prefix the prefix to change to
+     * @param sortPriority the sort priority in the tab list
+     * @param viewers the players who will see the fake prefix
+     */
+    void setFakePrefix(String player, String prefix, int sortPriority, Collection<Player> viewers);
 
     /**
      * Sets the suffix for a player. The previous
@@ -147,7 +241,7 @@ public interface INametagApi {
     void setSuffix(String player, String suffix);
 
     /**
-     * Sets the suffix for a player, including sort priority
+     * Sets the suffix for a player, including sort priority.
      * The previous prefix is kept if it exists.
      * <p>
      * Note: Only affects memory, does NOT
@@ -155,8 +249,38 @@ public interface INametagApi {
      *
      * @param player the player whose nametag to change
      * @param suffix the suffix to change to
+     * @param sortPriority the sort priority in the tab list
      */
     void setSuffix(String player, String suffix, int sortPriority);
+
+    /**
+     * Sets the suffix for a player, that will
+     * only be visible for certain players. The previous
+     * prefix is kept if it exists.
+     * <p>
+     * Note: Only affects memory, does NOT
+     * add/remove from storage.
+     *
+     * @param player the player whose nametag to change
+     * @param suffix the suffix to change to
+     * @param viewers the players who will see the fake suffix
+     */
+    void setFakeSuffix(String player, String suffix, Collection<Player> viewers);
+
+    /**
+     * Sets the suffix for a player, that will
+     * only be visible for certain players. The previous
+     * prefix is kept if it exists.
+     * <p>
+     * Note: Only affects memory, does NOT
+     * add/remove from storage.
+     *
+     * @param player the player whose nametag to change
+     * @param suffix the suffix to change to
+     * @param sortPriority the sort priority in the tab list
+     * @param viewers the players who will see the fake suffix
+     */
+    void setFakeSuffix(String player, String suffix, int sortPriority, Collection<Player> viewers);
 
     /**
      * Sets the nametag for a player.
@@ -171,6 +295,36 @@ public interface INametagApi {
     void setNametag(Player player, String prefix, String suffix);
 
     /**
+     * Sets the nametag for a player, including
+     * sort priority.
+     * <p>
+     * Note: Only affects memory, does NOT
+     * add/remove from storage.
+     *
+     * @param player the player whose nametag to change
+     * @param prefix the prefix to change to
+     * @param suffix the suffix to change to
+     * @param sortPriority the sort priority in the tab list
+     */
+    void setNametag(Player player, String prefix, String suffix, int sortPriority);
+
+    /**
+     * Sets the fake nametag for a player, including
+     * sort priority and viewers, who will see
+     * this fake nametag.
+     * <p>
+     * Note: Only affects memory, does NOT
+     * add/remove from storage.
+     *
+     * @param player the player whose nametag to change
+     * @param prefix the prefix to change to
+     * @param suffix the suffix to change to
+     * @param sortPriority the sort priority in the tab list
+     * @param viewers the players who will see the fake nametag
+     */
+    void setFakeNametag(Player player, String prefix, String suffix, int sortPriority, Collection<Player> viewers);
+
+    /**
      * Sets the nametag for a player.
      * <p>
      * Note: Only affects memory, does NOT
@@ -181,6 +335,36 @@ public interface INametagApi {
      * @param suffix the suffix to change to
      */
     void setNametag(String player, String prefix, String suffix);
+
+    /**
+     * Sets the nametag for a player, including
+     * sort priority.
+     * <p>
+     * Note: Only affects memory, does NOT
+     * add/remove from storage.
+     *
+     * @param player the player whose nametag to change
+     * @param prefix the prefix to change to
+     * @param suffix the suffix to change to
+     * @param sortPriority the sort priority in the tab list
+     */
+    void setNametag(String player, String prefix, String suffix, int sortPriority);
+
+    /**
+     * Sets the fake nametag for a player, including
+     * sort priority and viewers, who will see
+     * this fake nametag.
+     * <p>
+     * Note: Only affects memory, does NOT
+     * add/remove from storage.
+     *
+     * @param player the player whose nametag to change
+     * @param prefix the prefix to change to
+     * @param suffix the suffix to change to
+     * @param sortPriority the sort priority in the tab list
+     * @param viewers the players who will see the fake nametag
+     */
+    void setFakeNametag(String player, String prefix, String suffix, int sortPriority, Collection<Player> viewers);
 
     /**
      * Gets the data of all groups

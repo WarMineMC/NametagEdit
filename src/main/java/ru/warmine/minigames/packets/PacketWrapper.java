@@ -10,12 +10,14 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import ru.warmine.minigames.NametagHandler;
+import ru.warmine.minigames.enums.TeamAction;
 import ru.warmine.minigames.utils.Utils;
 
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class PacketWrapper {
 
     public String error;
-    private Object packet = PacketAccessor.createPacket();
+    private final Object packet = PacketAccessor.createPacket();
 
     private static Constructor<?> ChatComponentText;
     private static Class<? extends Enum> typeEnumChatFormat;
@@ -34,18 +36,17 @@ public class PacketWrapper {
         }
     }
 
-    public PacketWrapper(String name, int param, List<String> members) {
-        if (param != 3 && param != 4) {
+    public PacketWrapper(String name, TeamAction mode, Collection<String> members) {
+        if (mode != TeamAction.ADD_MEMBER && mode != TeamAction.REMOVE_MEMBER) {
             throw new IllegalArgumentException("Method must be join or leave for player constructor");
         }
-        setupDefaults(name, param);
+        setupDefaults(name, mode);
         setupMembers(members);
     }
 
-    @SuppressWarnings("unchecked")
-    public PacketWrapper(String name, String prefix, String suffix, int param, Collection<?> players) {
-        setupDefaults(name, param);
-        if (param == 0 || param == 2) {
+    public PacketWrapper(String name, String prefix, String suffix, TeamAction mode, Collection<?> players) {
+        setupDefaults(name, mode);
+        if (mode == TeamAction.CREATE || mode == TeamAction.UPDATE) {
             try {            	            	
                 if (PacketAccessor.isLegacyVersion()) {
                     PacketAccessor.DISPLAY_NAME.set(packet, name);
@@ -81,7 +82,7 @@ public class PacketWrapper {
                     PacketAccessor.VISIBILITY.set(packet, "always");
                 }
 
-                if (param == 0) {
+                if (mode == TeamAction.CREATE) {
                     ((Collection) PacketAccessor.MEMBERS.get(packet)).addAll(players);
                 }
             } catch (Exception e) {
@@ -100,10 +101,10 @@ public class PacketWrapper {
         }
     }
 
-    private void setupDefaults(String name, int param) {
+    private void setupDefaults(String name, TeamAction mode) {
         try {
             PacketAccessor.TEAM_NAME.set(packet, name);
-            PacketAccessor.PARAM_INT.set(packet, param);
+            PacketAccessor.PARAM_INT.set(packet, mode.id);
 
             if (NametagHandler.DISABLE_PUSH_ALL_TAGS && PacketAccessor.PUSH != null) {
                 PacketAccessor.PUSH.set(packet, "never");
@@ -121,4 +122,7 @@ public class PacketWrapper {
         PacketAccessor.sendPacket(player, packet);
     }
 
+    public void send(Collection<Player> players) {
+        players.forEach(this::send);
+    }
 }

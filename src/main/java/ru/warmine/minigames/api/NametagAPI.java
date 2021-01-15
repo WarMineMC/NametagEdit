@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -65,6 +66,16 @@ public final class NametagAPI implements INametagApi {
     }
 
     @Override
+    public void setFakePrefix(Player player, String prefix, Collection<Player> viewers) {
+        this.setFakePrefix(player.getName(), prefix, -1, viewers);
+    }
+
+    @Override
+    public void setFakePrefix(Player player, String prefix, int sortPriority, Collection<Player> viewers) {
+        this.setFakePrefix(player.getName(), prefix, sortPriority, viewers);
+    }
+
+    @Override
     public void setPrefix(String player, String prefix) {
         this.setPrefix(player, prefix, -1);
     }
@@ -73,6 +84,17 @@ public final class NametagAPI implements INametagApi {
     public void setPrefix(String player, String prefix, int sortPriority) {
         FakeTeam fakeTeam = manager.getFakeTeam(player);
         manager.setNametag(player, prefix, fakeTeam == null ? null : fakeTeam.getSuffix(), sortPriority);
+    }
+
+    @Override
+    public void setFakePrefix(String player, String prefix, Collection<Player> viewers) {
+        this.setFakePrefix(player, prefix, -1, viewers);
+    }
+
+    @Override
+    public void setFakePrefix(String player, String prefix, int sortPriority, Collection<Player> viewers) {
+        FakeTeam fakeTeam = manager.getFakeTeam(player);
+        manager.displayFakeNametag(player, prefix, fakeTeam == null ? null : fakeTeam.getSuffix(), sortPriority, viewers);
     }
 
     @Override
@@ -87,6 +109,16 @@ public final class NametagAPI implements INametagApi {
     }
 
     @Override
+    public void setFakeSuffix(Player player, String suffix, Collection<Player> viewers) {
+        this.setFakeSuffix(player.getName(), suffix, -1, viewers);
+    }
+
+    @Override
+    public void setFakeSuffix(Player player, String suffix, int sortPriority, Collection<Player> viewers) {
+        this.setFakeSuffix(player.getName(), suffix, sortPriority, viewers);
+    }
+
+    @Override
     public void setSuffix(String player, String suffix) {
         this.setSuffix(player, suffix, -1);
     }
@@ -98,13 +130,44 @@ public final class NametagAPI implements INametagApi {
     }
 
     @Override
+    public void setFakeSuffix(String player, String suffix, Collection<Player> viewers) {
+        this.setFakeSuffix(player, suffix, -1, viewers);
+    }
+
+    @Override
+    public void setFakeSuffix(String player, String suffix, int sortPriority, Collection<Player> viewers) {
+        FakeTeam fakeTeam = manager.getFakeTeam(player);
+        manager.displayFakeNametag(player, fakeTeam == null ? null : fakeTeam.getPrefix(), suffix, sortPriority, viewers);
+    }
+
+    @Override
     public void setNametag(Player player, String prefix, String suffix) {
         setNametagAlt(player, prefix, suffix);
     }
 
     @Override
+    public void setNametag(Player player, String prefix, String suffix, int sortPriority) {
+        setNametagAlt(player, prefix, suffix, sortPriority);
+    }
+
+    @Override
+    public void setFakeNametag(Player player, String prefix, String suffix, int sortPriority, Collection<Player> viewers) {
+        manager.displayFakeNametag(player.getName(), prefix, suffix, sortPriority, viewers);
+    }
+
+    @Override
     public void setNametag(String player, String prefix, String suffix) {
         manager.setNametag(player, prefix, suffix);
+    }
+
+    @Override
+    public void setNametag(String player, String prefix, String suffix, int sortPriority) {
+        manager.setNametag(player, prefix, suffix, sortPriority);
+    }
+
+    @Override
+    public void setFakeNametag(String player, String prefix, String suffix, int sortPriority, Collection<Player> viewers) {
+       manager.displayFakeNametag(player, prefix, suffix, sortPriority, viewers);
     }
 
     @Override

@@ -5,7 +5,7 @@ import ru.warmine.minigames.packets.VersionChecker;
 import ru.warmine.minigames.packets.VersionChecker.BukkitVersion;
 import lombok.Data;
 
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * This class represents a Scoreboard Team. It is used
@@ -21,12 +21,16 @@ public class FakeTeam {
     // This represents the number of FakeTeams that have been created.
     // It is used to generate a unique Team name.
     private static int ID = 0;
-    private final ArrayList<String> members = new ArrayList<>();
+    private Set<String> members;
     private String name;
     private String prefix = "";
     private String suffix = "";
 
     public FakeTeam(String prefix, String suffix, int sortPriority, boolean playerTag) {
+        this(prefix, suffix, sortPriority, Collections.emptyList(), playerTag);
+    }
+
+    public FakeTeam(String prefix, String suffix, int sortPriority, Collection<String> members, boolean playerTag) {
         this.name = UNIQUE_ID + "_" + getNameFromInput(sortPriority) + ++ID + (playerTag ? "+P" : "");
 
  		// Adding a VersionChecker for proper limits to ensure they're no crashes.
@@ -50,13 +54,11 @@ public class FakeTeam {
 
 		this.prefix = prefix;
 		this.suffix = suffix;
-
+		this.members = new HashSet<>(members);
 	}
 
     public void addMember(String player) {
-        if (!members.contains(player)) {
-            members.add(player);
-        }
+        members.add(player);
     }
 
     public boolean isSimilar(String prefix, String suffix) {

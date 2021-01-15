@@ -8,6 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import ru.warmine.minigames.api.INametagApi;
 import ru.warmine.minigames.api.NametagAPI;
+import ru.warmine.minigames.enums.TeamAction;
 import ru.warmine.minigames.hooks.HookGroupManager;
 import ru.warmine.minigames.hooks.HookGuilds;
 import ru.warmine.minigames.hooks.HookLibsDisguise;
@@ -87,7 +88,7 @@ public class NametagEdit extends JavaPlugin {
     }
 
     private void testCompat() {
-        PacketWrapper wrapper = new PacketWrapper("TEST", "&f", "", 0, new ArrayList<>());
+        PacketWrapper wrapper = new PacketWrapper("TEST", "&f", "", TeamAction.CREATE, new ArrayList<>());
         wrapper.send();
         if (wrapper.error == null) return;
         Bukkit.getPluginManager().disablePlugin(this);
