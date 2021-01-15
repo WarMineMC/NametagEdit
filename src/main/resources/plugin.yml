@@ -1,6 +1,6 @@
 name: NametagEdit
 main: ru.warmine.minigames.NametagEdit
-version: 4.5.1
+version: ${project.version}
 authors: [sgtcaze, Cory]
 soft-depend: [zPermissions, PermissionsEX, GroupManager, LuckPerms, LibsDisguises, Guilds, PlaceholderAPI]
 commands:
