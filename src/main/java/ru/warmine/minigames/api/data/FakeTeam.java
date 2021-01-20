@@ -1,11 +1,14 @@
 package ru.warmine.minigames.api.data;
 
+import com.google.common.collect.*;
+import org.bukkit.entity.Player;
 import ru.warmine.minigames.utils.Utils;
 import ru.warmine.minigames.packets.VersionChecker;
 import ru.warmine.minigames.packets.VersionChecker.BukkitVersion;
 import lombok.Data;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class represents a Scoreboard Team. It is used
@@ -22,6 +25,7 @@ public class FakeTeam {
     // It is used to generate a unique Team name.
     private static int ID = 0;
     private Set<String> members;
+    private SetMultimap<String, String> fakeMembers;
     private String name;
     private String prefix = "";
     private String suffix = "";
@@ -55,7 +59,50 @@ public class FakeTeam {
 		this.prefix = prefix;
 		this.suffix = suffix;
 		this.members = new HashSet<>(members);
+		this.fakeMembers = HashMultimap.create();
 	}
+
+	public void addFakeMember(String target, Player player) {
+        this.fakeMembers.put(target, player.getName());
+    }
+
+    public void addFakeMember(String target, Collection<Player> players) {
+        this.fakeMembers.putAll(target, players.stream().map(Player::getName).collect(Collectors.toSet()));
+    }
+
+    public void removeFakeMember(String target, String player) {
+        this.fakeMembers.remove(target, player);
+    }
+
+    public Set<String> removeFakeMember(String target) {
+        return this.fakeMembers.removeAll(target);
+    }
+
+    public boolean isFakeMember(String target) {
+        return this.fakeMembers.containsKey(target);
+    }
+
+    public Collection<String> getFakeTargets(String viewer) {
+        return this.fakeMembers.asMap()
+                .entrySet().stream()
+                .filter(entry -> entry.getValue().contains(viewer))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+    }
+
+    public Collection<String> removeViewer(String viewer) {
+        Collection<String> targets = this.getFakeTargets(viewer);
+
+        for (String target : targets) {
+            this.fakeMembers.remove(target, viewer);
+        }
+
+        return targets;
+    }
+
+    public boolean isViewer(String viewer) {
+        return this.fakeMembers.containsValue(viewer);
+    }
 
     public void addMember(String player) {
         members.add(player);

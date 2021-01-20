@@ -3,7 +3,6 @@ package ru.warmine.minigames.packets;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -40,8 +39,9 @@ public class PacketWrapper {
         if (mode != TeamAction.ADD_MEMBER && mode != TeamAction.REMOVE_MEMBER) {
             throw new IllegalArgumentException("Method must be join or leave for player constructor");
         }
-        setupDefaults(name, mode);
-        setupMembers(members);
+
+        this.setupDefaults(name, mode);
+        this.setupMembers(members);
     }
 
     public PacketWrapper(String name, String prefix, String suffix, TeamAction mode, Collection<?> players) {
@@ -92,7 +92,7 @@ public class PacketWrapper {
     }
 
     @SuppressWarnings("unchecked")
-    private void setupMembers(Collection<?> players) {
+    public void setupMembers(Collection<?> players) {
         try {
             players = players == null || players.isEmpty() ? new ArrayList<>() : players;
             ((Collection) PacketAccessor.MEMBERS.get(packet)).addAll(players);
@@ -104,7 +104,7 @@ public class PacketWrapper {
     private void setupDefaults(String name, TeamAction mode) {
         try {
             PacketAccessor.TEAM_NAME.set(packet, name);
-            PacketAccessor.PARAM_INT.set(packet, mode.id);
+            PacketAccessor.PARAM_INT.set(packet, mode.getId());
 
             if (NametagHandler.DISABLE_PUSH_ALL_TAGS && PacketAccessor.PUSH != null) {
                 PacketAccessor.PUSH.set(packet, "never");

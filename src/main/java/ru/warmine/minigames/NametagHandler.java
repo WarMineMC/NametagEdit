@@ -124,7 +124,10 @@ public class NametagHandler implements Listener {
      */
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        nametagManager.reset(event.getPlayer().getName());
+        String name = event.getPlayer().getName();
+
+        nametagManager.reset(name);
+        nametagManager.resetFakeTags(name);
     }
 
     /**
@@ -391,7 +394,10 @@ public class NametagHandler implements Listener {
             }
         }
 
-        if (tempNametag == null) return;
+        if (tempNametag == null) {
+            return;
+        }
+
         plugin.debug("Applying " + (tempNametag.isPlayerTag() ? "PlayerTag" : "GroupTag") + " to " + player.getName());
 
         final INametag nametag = tempNametag;

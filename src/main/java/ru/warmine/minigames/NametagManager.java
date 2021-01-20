@@ -1,7 +1,9 @@
 package ru.warmine.minigames;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
+import com.google.common.base.Joiner;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -76,17 +78,17 @@ public class NametagManager {
             return;
         }
 
-        FakeTeam team = this.getOrCreateTeam(
-                prefix,
-                suffix,
-                sortPriority
-        );
+        FakeTeam team = this.getOrCreateTeam(prefix, suffix, sortPriority);
+        team.addFakeMember(player, viewers);
 
-        this.displayTeamPackets(
-                team,
+        this.displayTeamPackets(team, player, viewers);
+
+        this.plugin.debug(String.format(
+                "Showing fake %s's tag for viewers: %s. FakeTeam: %s",
                 player,
-                viewers
-        );
+                viewers.stream().map(Player::getName).collect(Collectors.joining(",")),
+                team.getName()
+        ));
     }
 
     /**
@@ -111,9 +113,10 @@ public class NametagManager {
         FakeTeam team = this.getOrCreateTeam(
                 prefix,
                 suffix,
-                sortPriority,
-                Collections.singletonList(player)
+                sortPriority
         );
+
+        team.addMember(player);
 
         this.addPlayerToTeamPackets(team, player);
         this.cache(player, team);
@@ -132,6 +135,7 @@ public class NametagManager {
     private FakeTeam reset(String player, FakeTeam fakeTeam) {
         if (fakeTeam != null && fakeTeam.getMembers().remove(player)) {
             boolean delete;
+
             Player removing = Bukkit.getPlayerExact(player);
             if (removing != null) {
                 delete = removePlayerFromTeamPackets(fakeTeam, removing.getName());
@@ -186,8 +190,83 @@ public class NametagManager {
     }
 
     void sendTeams(Player player) {
+        String name = player.getName();
+
         for (FakeTeam fakeTeam : TEAMS.values()) {
-            new PacketWrapper(fakeTeam.getName(), fakeTeam.getPrefix(), fakeTeam.getSuffix(), TeamAction.CREATE, fakeTeam.getMembers()).send(player);
+            Collection<String> allMembers = fakeTeam.getMembers();
+
+            if (fakeTeam.isViewer(name)) {
+                Collection<String> targets = fakeTeam.getFakeTargets(name);
+                allMembers.addAll(targets);
+
+                this.plugin.debug(String.format(
+                        "%s is a viewer of the %s team. Targets: %s. Adding fake members...",
+                        name,
+                        fakeTeam.getName(),
+                        Joiner.on(", ").join(targets)
+                ));
+            }
+
+            new PacketWrapper(
+                    fakeTeam.getName(),
+                    fakeTeam.getPrefix(),
+                    fakeTeam.getSuffix(),
+                    TeamAction.CREATE,
+                    allMembers
+            ).send(player);
+        }
+    }
+
+    public void resetFakeTags(String player) {
+        Player onlinePlayer = Bukkit.getPlayerExact(player);
+
+        for (FakeTeam fakeTeam : TEAMS.values()) {
+            if (fakeTeam.isFakeMember(player)) {
+                Collection<String> viewers = fakeTeam.removeFakeMember(player);
+                Collection<Player> viewersAsPlayers = viewers.stream()
+                        .map(Bukkit::getPlayerExact)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toSet());
+
+                this.plugin.debug(String.format(
+                        "Reset the %s's fake nametag for viewers: %s.",
+                        player,
+                        Joiner.on(", ").join(viewers)
+                ));
+
+                new PacketWrapper(
+                        fakeTeam.getName(),
+                        TeamAction.REMOVE_MEMBER,
+                        Collections.singletonList(player)
+                ).send(viewersAsPlayers);
+            }
+
+            if (fakeTeam.isViewer(player)) {
+                Collection<String> targets = fakeTeam
+                        .removeViewer(player)
+                        .stream()
+                        .filter(name -> Bukkit.getPlayerExact(name) != null)
+                        .collect(Collectors.toSet());
+
+                this.plugin.debug(String.format(
+                        "%s is a viewer of the %s team. Targets: %s. Removing fake members...",
+                        player,
+                        fakeTeam.getName(),
+                        Joiner.on(", ").join(targets)
+                ));
+
+                if (onlinePlayer != null && !targets.isEmpty()) {
+                    new PacketWrapper(
+                            fakeTeam.getName(),
+                            TeamAction.REMOVE_MEMBER,
+                            targets
+                    ).send(onlinePlayer);
+                }
+            }
+        }
+
+        if (onlinePlayer != null) {
+            this.sendTeams(onlinePlayer);
         }
     }
 

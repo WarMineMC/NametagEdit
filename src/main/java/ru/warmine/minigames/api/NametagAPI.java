@@ -186,6 +186,16 @@ public final class NametagAPI implements INametagApi {
     }
 
     @Override
+    public void resetFakeTags(Player player) {
+        this.resetFakeTags(player.getName());
+    }
+
+    @Override
+    public void resetFakeTags(String player) {
+        manager.resetFakeTags(player);
+    }
+
+    @Override
     public void applyTagToPlayer(Player player, boolean loggedIn) {
         handler.applyTagToPlayer(player,loggedIn);
     }

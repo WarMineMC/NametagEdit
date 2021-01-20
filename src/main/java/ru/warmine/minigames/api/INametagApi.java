@@ -389,6 +389,28 @@ public interface INametagApi {
     void applyTags();
 
     /**
+     * Resets all fake tags for the player.
+     *
+     * <p>
+     * Note: Only affects memory, does NOT
+     * add/remove from storage.
+     * </p>
+     * @param player the player
+     */
+    void resetFakeTags(Player player);
+
+    /**
+     * Resets all fake tags for the player.
+     *
+     * <p>
+     * Note: Only affects memory, does NOT
+     * add/remove from storage.
+     * </p>
+     * @param player the player
+     */
+    void resetFakeTags(String player);
+
+    /**
      * Applies tags to specific player
      * <p>
      * Note: Only affects memory, does NOT

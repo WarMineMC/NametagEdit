@@ -1,7 +1,9 @@
 package ru.warmine.minigames.enums;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
 @AllArgsConstructor
 public enum TeamAction {
     CREATE(0),
@@ -10,5 +12,5 @@ public enum TeamAction {
     ADD_MEMBER(3),
     REMOVE_MEMBER(4);
 
-    public final int id;
+    private final int id;
 }
