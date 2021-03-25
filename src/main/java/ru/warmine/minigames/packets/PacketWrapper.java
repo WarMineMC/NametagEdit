@@ -3,11 +3,13 @@ package ru.warmine.minigames.packets;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+import org.bukkit.scoreboard.Team;
 import ru.warmine.minigames.NametagHandler;
 import ru.warmine.minigames.enums.TeamAction;
 import ru.warmine.minigames.utils.Utils;
@@ -33,6 +35,10 @@ public class PacketWrapper {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public PacketWrapper(String name, TeamAction mode, String member) {
+        this(name, mode, Collections.singletonList(member));
     }
 
     public PacketWrapper(String name, TeamAction mode, Collection<String> members) {

@@ -25,6 +25,7 @@ public class FakeTeam {
     // It is used to generate a unique Team name.
     private static int ID = 0;
     private Set<String> members;
+    // String: target, String: viewer -> Set<String>: viewers
     private SetMultimap<String, String> fakeMembers;
     private String name;
     private String prefix = "";
@@ -82,6 +83,10 @@ public class FakeTeam {
         return this.fakeMembers.containsKey(target);
     }
 
+    public boolean isEmpty() {
+        return this.members.isEmpty() && this.fakeMembers.isEmpty();
+    }
+
     public Collection<String> getFakeTargets(String viewer) {
         return this.fakeMembers.asMap()
                 .entrySet().stream()
@@ -100,12 +105,29 @@ public class FakeTeam {
         return targets;
     }
 
+    public Collection<String> removeViewers(String target, Collection<String> viewers) {
+        Collection<String> actualViewers = this.fakeMembers.get(target)
+                .stream()
+                .filter(viewers::contains)
+                .collect(Collectors.toSet());
+
+        for (String viewer : actualViewers) {
+            this.fakeMembers.remove(target, viewer);
+        }
+
+        return actualViewers;
+    }
+
     public boolean isViewer(String viewer) {
         return this.fakeMembers.containsValue(viewer);
     }
 
+    public boolean isMember(String player) {
+        return this.members.contains(player);
+    }
+
     public void addMember(String player) {
-        members.add(player);
+        this.members.add(player);
     }
 
     public boolean isSimilar(String prefix, String suffix) {

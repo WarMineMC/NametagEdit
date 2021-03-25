@@ -81,6 +81,10 @@ public class NametagEdit extends JavaPlugin {
         }
     }
 
+    void debug(String message, Object... args) {
+        this.debug(String.format(message, args));
+    }
+
     private boolean checkShouldRegister(String plugin) {
         if (Bukkit.getPluginManager().getPlugin(plugin) == null) return false;
         getLogger().info("Found " + plugin + "! Hooking in.");
@@ -92,14 +96,12 @@ public class NametagEdit extends JavaPlugin {
         wrapper.send();
         if (wrapper.error == null) return;
         Bukkit.getPluginManager().disablePlugin(this);
-        getLogger().severe(new StringBuilder()
-                .append("\n------------------------------------------------------\n")
-                .append("[WARNING] NametagEdit v").append(getDescription().getVersion()).append(" Failed to load! [WARNING]")
-                .append("\n------------------------------------------------------")
-                .append("\nThis might be an issue with reflection. REPORT this:\n> ")
-                .append(wrapper.error)
-                .append("\nThe plugin will now self destruct.\n------------------------------------------------------")
-                .toString());
+        getLogger().severe("\n------------------------------------------------------\n" +
+                "[WARNING] NametagEdit v" + getDescription().getVersion() + " Failed to load! [WARNING]" +
+                "\n------------------------------------------------------" +
+                "\nThis might be an issue with reflection. REPORT this:\n> " +
+                wrapper.error +
+                "\nThe plugin will now self destruct.\n------------------------------------------------------");
     }
 
 }

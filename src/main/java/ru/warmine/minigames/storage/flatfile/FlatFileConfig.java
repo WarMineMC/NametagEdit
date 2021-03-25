@@ -27,8 +27,8 @@ public class FlatFileConfig implements AbstractConfig {
     private YamlConfiguration groups;
     private YamlConfiguration players;
 
-    private NametagEdit plugin;
-    private NametagHandler handler;
+    private final NametagEdit plugin;
+    private final NametagHandler handler;
 
     public FlatFileConfig(NametagEdit plugin, NametagHandler handler) {
         this.plugin = plugin;
@@ -115,13 +115,10 @@ public class FlatFileConfig implements AbstractConfig {
                 return;
             }
 
-            UUIDFetcher.lookupUUID(key, plugin, new UUIDFetcher.UUIDLookup() {
-                @Override
-                public void response(UUID uuid) {
-                    if (players.contains("Players." + uuid.toString())) {
-                        players.set("Players." + uuid.toString(), priority);
-                        save(players, playersFile);
-                    }
+            UUIDFetcher.lookupUUID(key, plugin, uuid -> {
+                if (players.contains("Players." + uuid.toString())) {
+                    players.set("Players." + uuid.toString(), priority);
+                    save(players, playersFile);
                 }
             });
         }

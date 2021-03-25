@@ -1,6 +1,7 @@
 package ru.warmine.minigames;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Joiner;
@@ -17,8 +18,8 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class NametagManager {
 
-    private final HashMap<String, FakeTeam> TEAMS = new HashMap<>();
-    private final HashMap<String, FakeTeam> CACHED_FAKE_TEAMS = new HashMap<>();
+    private final ConcurrentHashMap<String, FakeTeam> TEAMS = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, FakeTeam> CACHED_FAKE_TEAMS = new ConcurrentHashMap<>();
     private final NametagEdit plugin;
 
     /**
@@ -58,11 +59,11 @@ public class NametagManager {
         TEAMS.put(team.getName(), team);
         this.addTeamPackets(team);
 
-        this.plugin.debug(String.format(
+        this.plugin.debug(
                 "Created FakeTeam %s. Size: %d.",
                 team.getName(),
                 TEAMS.size()
-        ));
+        );
 
         return team;
     }
@@ -74,7 +75,7 @@ public class NametagManager {
             int sortPriority,
             Collection<Player> viewers
     ) {
-        if (Bukkit.getPlayerExact(player) == null) {
+        if (viewers.isEmpty() || Bukkit.getPlayerExact(player) == null) {
             return;
         }
 
@@ -83,12 +84,12 @@ public class NametagManager {
 
         this.displayTeamPackets(team, player, viewers);
 
-        this.plugin.debug(String.format(
+        this.plugin.debug(
                 "Showing fake %s's tag for viewers: %s. FakeTeam: %s",
                 player,
                 viewers.stream().map(Player::getName).collect(Collectors.joining(",")),
                 team.getName()
-        ));
+        );
     }
 
     /**
@@ -99,11 +100,11 @@ public class NametagManager {
         FakeTeam previousTeam = getFakeTeam(player);
 
         if (previousTeam != null && previousTeam.isSimilar(prefix, suffix)) {
-            plugin.debug(String.format(
+            this.plugin.debug(
                     "%s already belongs to a similar team (\"%s\").",
                     player,
                     previousTeam.getName()
-            ));
+            );
 
             return;
         }
@@ -121,11 +122,11 @@ public class NametagManager {
         this.addPlayerToTeamPackets(team, player);
         this.cache(player, team);
 
-        plugin.debug(String.format(
+        this.plugin.debug(
                 "%s has been added to team %s.",
                 player,
                 team.getName()
-        ));
+        );
     }
 
     public FakeTeam reset(String player) {
@@ -148,7 +149,12 @@ public class NametagManager {
             if (delete) {
                 removeTeamPackets(fakeTeam);
                 TEAMS.remove(fakeTeam.getName());
-                plugin.debug("FakeTeam " + fakeTeam.getName() + " has been deleted. Size: " + TEAMS.size());
+
+                this.plugin.debug(
+                        "FakeTeam %s has been deleted. Size: %d.",
+                        fakeTeam.getName(),
+                        TEAMS.size()
+                );
             }
         }
 
@@ -181,7 +187,7 @@ public class NametagManager {
         setNametag(player, prefix, suffix, sortPriority, false);
     }
 
-    void setNametag(String player, String prefix, String suffix, int sortPriority, boolean playerTag) {
+    public void setNametag(String player, String prefix, String suffix, int sortPriority, boolean playerTag) {
         addPlayerToTeam(player, prefix != null ? prefix : "", suffix != null ? suffix : "", sortPriority, playerTag);
     }
 
@@ -189,7 +195,7 @@ public class NametagManager {
         displayTeam(player, prefix, suffix, sortPriority, viewers);
     }
 
-    void sendTeams(Player player) {
+    public void sendTeams(Player player) {
         String name = player.getName();
 
         for (FakeTeam fakeTeam : TEAMS.values()) {
@@ -199,12 +205,12 @@ public class NametagManager {
                 Collection<String> targets = fakeTeam.getFakeTargets(name);
                 allMembers.addAll(targets);
 
-                this.plugin.debug(String.format(
+                this.plugin.debug(
                         "%s is a viewer of the %s team. Targets: %s. Adding fake members...",
                         name,
                         fakeTeam.getName(),
                         Joiner.on(", ").join(targets)
-                ));
+                );
             }
 
             new PacketWrapper(
@@ -217,6 +223,36 @@ public class NametagManager {
         }
     }
 
+//    public void resetFakeTags(String player, Collection<String> viewers) {
+//        Player onlinePlayer = Bukkit.getPlayerExact(player);
+//
+//        for (FakeTeam fakeTeam : TEAMS.values()) {
+//            if (fakeTeam.isFakeMember(player)) {
+//                Collection<String> actualViewers = fakeTeam.removeViewers(player, viewers);
+//                Collection<Player> viewersAsPlayers = actualViewers.stream()
+//                        .map(Bukkit::getPlayerExact)
+//                        .filter(Objects::nonNull)
+//                        .collect(Collectors.toSet());
+//
+//                this.plugin.debug(
+//                        "Reset the %s's fake nametag for viewers: %s.",
+//                        player,
+//                        Joiner.on(", ").join(viewers)
+//                );
+//
+//                new PacketWrapper(
+//                        fakeTeam.getName(),
+//                        TeamAction.REMOVE_MEMBER,
+//                        player
+//                ).send(viewersAsPlayers);
+//            }
+//        }
+//
+//        if (onlinePlayer != null) {
+//            this.sendTeams(onlinePlayer);
+//        }
+//    }
+
     public void resetFakeTags(String player) {
         Player onlinePlayer = Bukkit.getPlayerExact(player);
 
@@ -228,17 +264,22 @@ public class NametagManager {
                         .filter(Objects::nonNull)
                         .collect(Collectors.toSet());
 
-                this.plugin.debug(String.format(
-                        "Reset the %s's fake nametag for viewers: %s.",
+                this.plugin.debug(
+                        "Removed %s's fake nametag for viewers: %s.",
                         player,
                         Joiner.on(", ").join(viewers)
-                ));
+                );
 
                 new PacketWrapper(
                         fakeTeam.getName(),
                         TeamAction.REMOVE_MEMBER,
-                        Collections.singletonList(player)
+                        player
                 ).send(viewersAsPlayers);
+
+                this.refreshNameTag(
+                        player,
+                        viewersAsPlayers
+                );
             }
 
             if (fakeTeam.isViewer(player)) {
@@ -248,12 +289,12 @@ public class NametagManager {
                         .filter(name -> Bukkit.getPlayerExact(name) != null)
                         .collect(Collectors.toSet());
 
-                this.plugin.debug(String.format(
+                this.plugin.debug(
                         "%s is a viewer of the %s team. Targets: %s. Removing fake members...",
                         player,
                         fakeTeam.getName(),
                         Joiner.on(", ").join(targets)
-                ));
+                );
 
                 if (onlinePlayer != null && !targets.isEmpty()) {
                     new PacketWrapper(
@@ -261,16 +302,25 @@ public class NametagManager {
                             TeamAction.REMOVE_MEMBER,
                             targets
                     ).send(onlinePlayer);
+
+                    for (String target : targets) {
+                        this.refreshNameTag(target, onlinePlayer);
+                    }
                 }
             }
-        }
 
-        if (onlinePlayer != null) {
-            this.sendTeams(onlinePlayer);
+            if (fakeTeam.isEmpty()) {
+                TEAMS.remove(fakeTeam.getName());
+                this.plugin.debug(
+                        "FakeTeam %s has been deleted. Size: %d.",
+                        fakeTeam.getName(),
+                        TEAMS.size()
+                );
+            }
         }
     }
 
-    void reset() {
+    public void reset() {
         for (FakeTeam fakeTeam : TEAMS.values()) {
             removePlayerFromTeamPackets(fakeTeam, fakeTeam.getMembers());
             removeTeamPackets(fakeTeam);
@@ -278,6 +328,31 @@ public class NametagManager {
         CACHED_FAKE_TEAMS.clear();
         TEAMS.clear();
     }
+
+    private void refreshNameTag(String target, Player viewer) {
+        this.refreshNameTag(target, Collections.singletonList(viewer));
+    }
+
+    private void refreshNameTag(String target, Collection<Player> viewers) {
+        CACHED_FAKE_TEAMS.values()
+                .stream()
+                .filter(team -> team.isMember(target))
+                .findFirst()
+                .ifPresent(team -> {
+                    new PacketWrapper(
+                            team.getName(),
+                            TeamAction.ADD_MEMBER,
+                            target
+                    ).send(viewers);
+
+                    this.plugin.debug(
+                            "Refreshing %s's nametag for viewers: %s.",
+                            target,
+                            viewers.stream().map(Player::getName).collect(Collectors.joining(", "))
+                    );
+                });
+    }
+
 
     // ==============================================================
     // Below are private methods to construct a new Scoreboard packet
@@ -293,7 +368,7 @@ public class NametagManager {
     private boolean removePlayerFromTeamPackets(FakeTeam fakeTeam, Collection<String> players) {
         new PacketWrapper(fakeTeam.getName(), TeamAction.REMOVE_MEMBER, players).send();
         fakeTeam.getMembers().removeAll(players);
-        return fakeTeam.getMembers().isEmpty();
+        return fakeTeam.isEmpty();
     }
 
     private void addTeamPackets(FakeTeam fakeTeam) {
@@ -301,10 +376,10 @@ public class NametagManager {
     }
 
     private void addPlayerToTeamPackets(FakeTeam fakeTeam, String player) {
-        new PacketWrapper(fakeTeam.getName(), TeamAction.ADD_MEMBER, Collections.singletonList(player)).send();
+        new PacketWrapper(fakeTeam.getName(), TeamAction.ADD_MEMBER, player).send();
     }
 
     private void displayTeamPackets(FakeTeam fakeTeam, String player, Collection<Player> viewers) {
-        new PacketWrapper(fakeTeam.getName(), TeamAction.ADD_MEMBER, Collections.singletonList(player)).send(viewers);
+        new PacketWrapper(fakeTeam.getName(), TeamAction.ADD_MEMBER, player).send(viewers);
     }
 }
